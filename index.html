@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IT 202 FINAL</title>
+  <!-- material.io -->
+  <link rel="stylesheet" href="https://unpkg.com/material-components-web@0.40.0/dist/material-components-web.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <style>
+    #map {
+      height: 500px;
+      max-width: 100%;
+    }
+
+    #map-border {
+      border: 10px;
+      margin: 10px;
+    }
+  </style>
+
+</head>
+
+<body>
+  <!-- top nav bar -->
+  <h1 class="mdc-typography--headline1">Map of Chicago</h1>
+
+  <div id="map-border">
+    <div id="map"></div>
+  </div>
+
+  <script>
+    // Main Javascript for map
+    let map;
+    // storing markers in array for use later
+    let markersArray = [];
+
+    let chicago = {
+      lat: 41.8781,
+      lng: -87.6298
+    };
+
+    let cityOfChicagoAPI = "https://data.cityofchicago.org/resource/9rg7-mz9y.json";
+    console.log(`API used is from city of chicago: ${cityOfChicagoAPI}`);
+
+
+    // Initialize and add the map
+    function initMap() {
+      let map = new google.maps.Map(document.getElementById('map'), {
+        center: chicago,
+        zoom: 11
+      });
+
+      // use cityofchicago API
+      $.get(cityOfChicagoAPI, function(response) {
+        let data1 = response;
+        createMarkers(map, data1);
+      });
+
+      function createMarkers(map, data1) {
+
+        $.each(data1, function(i, v) {
+          let marker;
+          let location = {
+            lat: parseFloat(v.latitude),
+            lng: parseFloat(v.longitude)
+          }
+
+          if (v.state) {
+            marker = new google.maps.Marker({
+              map: map,
+              position: location,
+              icon: {
+                url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+              }
+            })
+
+            let infowindow = new google.maps.InfoWindow({
+              content: v.district_name + '<br/>Address: ' + v.address
+            });
+
+            marker.addListener('click', function(results1) {
+              infowindow.open(map, marker);
+            });
+
+          };
+        });
+
+      };
+    };
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://unpkg.com/material-components-web@0.40.0/dist/material-components-web.min.js"></script>
+  <script src="script.js"></script>
+
+
+  <!-- putting the Google library scripts at the top level due to use across screens -->
+  <script src="https://apis.google.com/js/platform.js"></script>
+
+  <script src="https://apis.google.com/js/api.js"></script>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACQ-Se5XgECXNgPfbY88TBNMYoijTtSUI&callback=initMap" async defer></script>
+
+
+
+</body>
+
+</html>
